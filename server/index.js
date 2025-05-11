@@ -6,7 +6,7 @@ import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
 
 import bodyParser from 'body-parser';
-import taskRoutes from './routes/task.route.js';
+import taskRoutes from './routes/task.js';
 
 dotenv.config();
 const app = express();

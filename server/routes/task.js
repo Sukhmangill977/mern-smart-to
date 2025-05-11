@@ -7,6 +7,7 @@ const router = express.Router();
 
 // Get tasks for a specific user
 router.get('/:userId', verifyToken, async (req, res) => {
+  console.log("test")
   const { userId } = req.params;
 
   // Optional: check if the userId matches the logged-in user
@@ -23,9 +24,10 @@ router.get('/:userId', verifyToken, async (req, res) => {
 });
 
 // Create task
-router.post('/', verifyToken, async (req, res) => {
-  const { title, priority, deadline, status } = req.body;
+router.post('/newTask', verifyToken, async (req, res) => {
+  console.log("userud",req.user.id)
 
+  const { title, priority, deadline, status } = req.body;
   try {
     const newTask = new Task({
       title,

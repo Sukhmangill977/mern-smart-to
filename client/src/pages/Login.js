@@ -17,7 +17,7 @@ function Login() {
         email,
         password,
       });
-
+      
       // Storing the JWT token in localStorage
       localStorage.setItem("authToken", res.data.token);
 

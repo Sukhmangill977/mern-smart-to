@@ -3,9 +3,10 @@ import "./Dashboard.css";
 import SmartTaskSuggestor from "../components/SmartTaskSuggestor";
 
 function Dashboard() {
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem("authToken");
 const decodedToken = JSON.parse(atob(token.split('.')[1]));
 const userId = decodedToken.id;
+
  // Replace with actual logic to get the logged-in user's ID
   const [tasks, setTasks] = useState({
     task: [],
@@ -23,9 +24,8 @@ const userId = decodedToken.id;
   
   useEffect(() => {
     const fetchTasks = async () => {
-      const token = localStorage.getItem("token");
-
-      const res = await fetch("http://localhost:5001/api/tasks", {
+      const token = localStorage.getItem("authToken");
+      const res = await fetch(`http://localhost:5001/api/tasks/${userId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -41,7 +41,7 @@ const userId = decodedToken.id;
   const handleAddTask = async () => {
     if (newTask.title.trim() && newTask.deadline) {
       const payload = { ...newTask, status: "task", userId };
-      const res = await fetch(`http://localhost:5001/api/tasks`, {
+      const res = await fetch(`http://localhost:5001/api/tasks/newTask`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
