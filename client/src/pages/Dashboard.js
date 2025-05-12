@@ -4,10 +4,10 @@ import SmartTaskSuggestor from "../components/SmartTaskSuggestor";
 
 function Dashboard() {
   const token = localStorage.getItem("authToken");
-const decodedToken = JSON.parse(atob(token.split('.')[1]));
-const userId = decodedToken.id;
+  const decodedToken = JSON.parse(atob(token.split('.')[1]));
+  const userId = decodedToken.id;
 
- // Replace with actual logic to get the logged-in user's ID
+  // Replace with actual logic to get the logged-in user's ID
   const [tasks, setTasks] = useState({
     task: [],
     inProgress: [],
@@ -21,7 +21,7 @@ const userId = decodedToken.id;
   const [editingTask, setEditingTask] = useState(null);
 
   // Fetch tasks from backend
-  
+
   useEffect(() => {
     const fetchTasks = async () => {
       const token = localStorage.getItem("authToken");
@@ -32,10 +32,28 @@ const userId = decodedToken.id;
         },
       });
       const data = await res.json();
-      setTasks(data);
+
+      // Group by status
+      const grouped = {
+        task: [],
+        inProgress: [],
+        complete: [],
+      };
+
+      data.forEach((t) => {
+        if (grouped[t.status]) {
+          grouped[t.status].push(t);
+        }
+      });
+
+      setTasks(grouped);
     };
     fetchTasks();
   }, []);
+
+
+
+
 
   // Add a new task
   const handleAddTask = async () => {
@@ -43,11 +61,19 @@ const userId = decodedToken.id;
       const payload = { ...newTask, status: "task", userId };
       const res = await fetch(`http://localhost:5001/api/tasks/newTask`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
         body: JSON.stringify(payload),
       });
+
       const saved = await res.json();
-      setTasks((prev) => ({ ...prev, task: [...prev.task, saved] }));
+      setTasks((prev) => ({
+        ...prev,
+        task: [...(prev?.task || []), saved],
+      }));
+
       setNewTask({ title: "", priority: "Medium", deadline: "" });
     }
   };
@@ -60,9 +86,13 @@ const userId = decodedToken.id;
     if (!task) return;
     const res = await fetch(`http://localhost:5001/api/tasks/${taskId}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
       body: JSON.stringify({ status: targetStatus }),
     });
+
     const updated = await res.json();
     const updatedTasks = { task: [], inProgress: [], complete: [] };
     Object.values(tasks)
@@ -78,7 +108,11 @@ const userId = decodedToken.id;
   const handleDeleteTask = async (taskId) => {
     await fetch(`http://localhost:5001/api/tasks/${taskId}`, {
       method: "DELETE",
+      headers: {
+        "Authorization": `Bearer ${token}`
+      },
     });
+
     const updated = { task: [], inProgress: [], complete: [] };
     Object.values(tasks)
       .flat()
@@ -99,7 +133,10 @@ const userId = decodedToken.id;
       `http://localhost:5001/api/tasks/${editingTask._id}`,
       {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
         body: JSON.stringify({
           title: editingTask.title,
           priority: editingTask.priority,
@@ -107,6 +144,7 @@ const userId = decodedToken.id;
         }),
       }
     );
+
     const updated = await res.json();
     const updatedTasks = { task: [], inProgress: [], complete: [] };
     Object.values(tasks)
@@ -197,9 +235,8 @@ const userId = decodedToken.id;
                     <div className="task-details">
                       <strong>{task.title}</strong>
                       <span
-                        className={`priority ${
-                          task.priority?.toLowerCase?.() || "medium"
-                        }`}
+                        className={`priority ${task.priority?.toLowerCase?.() || "medium"
+                          }`}
                       >
                         {task.priority || "Medium"}
                       </span>

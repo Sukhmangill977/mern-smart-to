@@ -13,13 +13,9 @@ const app = express();
 const PORT = process.env.PORT || 5001;
 
 // ✅ CORS Options must be defined before usage
-const corsOptions = {
-  origin: "http://localhost:3000",
-  methods: "GET,POST,PUT,DELETE,OPTIONS",
-  allowedHeaders: "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-};
+app.use(cors());
 
-app.use(cors(corsOptions)); // Apply CORS middleware here
+// app.use(cors(corsOptions)); // Apply CORS middleware here
 app.use(bodyParser.json());
 app.use(express.json());
 
@@ -116,5 +112,3 @@ app.use('/api/tasks', taskRoutes);
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
-
-
