@@ -220,7 +220,17 @@ function Dashboard() {
           )}
         </div>
       </div>
-      
+       <div className="task-sections">
+  {Object.keys(tasks).map((section) => (
+    <div className="section" key={section}>
+      ...
+    </div>
+  ))}
+</div>
+
+{/* 🔻 Add AI Summary below all task sections */}
+<AISummary tasks={tasks} />
+
       <div className="task-sections">
         {Object.keys(tasks).map((section) => (
           <div className="section" key={section}>
@@ -280,17 +290,7 @@ function Dashboard() {
           </div>
           
         ))}
-        <div className="task-sections">
-  {Object.keys(tasks).map((section) => (
-    <div className="section" key={section}>
-      ...
-    </div>
-  ))}
-</div>
-
-{/* 🔻 Add AI Summary below all task sections */}
-<AISummary tasks={tasks} />
-
+       
       </div>
     </div>
     

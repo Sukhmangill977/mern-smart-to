@@ -22,7 +22,7 @@ function AISummary({ tasks }) {
       backgroundColor: "#f9f9f9",
       borderRadius: "8px"
     }}>
-      <h3>🧠 AI Summary</h3>
+      <h3>🧠Summary</h3>
       <p style={{ fontSize: "1.1rem", lineHeight: "1.6" }}>{summaryText()}</p>
     </div>
   );
