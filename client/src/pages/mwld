@@ -7,20 +7,20 @@ function Dashboard() {
   const decodedToken = JSON.parse(atob(token.split('.')[1]));
   const userId = decodedToken.id;
 
-  // Replace with actual logic to get the logged-in user's ID
   const [tasks, setTasks] = useState({
     task: [],
     inProgress: [],
     complete: [],
   });
+
   const [newTask, setNewTask] = useState({
     title: "",
+    description: "", 
     priority: "Medium",
     deadline: "",
   });
-  const [editingTask, setEditingTask] = useState(null);
 
-  // Fetch tasks from backend
+  const [editingTask, setEditingTask] = useState(null);
 
   useEffect(() => {
     const fetchTasks = async () => {
@@ -33,7 +33,6 @@ function Dashboard() {
       });
       const data = await res.json();
 
-      // Group by status
       const grouped = {
         task: [],
         inProgress: [],
@@ -51,10 +50,6 @@ function Dashboard() {
     fetchTasks();
   }, []);
 
-
-
-
-  // Add a new task
   const handleAddTask = async () => {
     if (newTask.title.trim() && newTask.deadline) {
       const payload = { ...newTask, status: "task", userId };
@@ -73,11 +68,10 @@ function Dashboard() {
         task: [...(prev?.task || []), saved],
       }));
 
-      setNewTask({ title: "", priority: "Medium", deadline: "" });
+      setNewTask({ title: "", description: "", priority: "Medium", deadline: "" }); 
     }
   };
 
-  // Move task to another section
   const handleMoveTask = async (taskId, targetStatus) => {
     const task = Object.values(tasks)
       .flat()
@@ -103,7 +97,6 @@ function Dashboard() {
     setTasks(updatedTasks);
   };
 
-  // Delete a task
   const handleDeleteTask = async (taskId) => {
     await fetch(`http://localhost:5001/api/tasks/${taskId}`, {
       method: "DELETE",
@@ -121,12 +114,10 @@ function Dashboard() {
     setTasks(updated);
   };
 
-  // Start editing a task
   const startEditing = (task, section) => {
     setEditingTask({ ...task, section });
   };
 
-  // Update task
   const handleUpdateTask = async () => {
     const res = await fetch(
       `http://localhost:5001/api/tasks/${editingTask._id}`,
@@ -138,6 +129,7 @@ function Dashboard() {
         },
         body: JSON.stringify({
           title: editingTask.title,
+          description: editingTask.description, 
           priority: editingTask.priority,
           deadline: editingTask.deadline,
         }),
@@ -192,6 +184,15 @@ function Dashboard() {
                 : setNewTask({ ...newTask, title: e.target.value })
             }
           />
+          <textarea
+            placeholder="Task Description"
+            value={editingTask ? editingTask.description : newTask.description}
+            onChange={(e) =>
+              editingTask
+                ? setEditingTask({ ...editingTask, description: e.target.value })
+                : setNewTask({ ...newTask, description: e.target.value })
+            }
+          ></textarea>
           <select
             value={editingTask ? editingTask.priority : newTask.priority}
             onChange={(e) =>
@@ -220,7 +221,7 @@ function Dashboard() {
           )}
         </div>
       </div>
-      
+
       <div className="task-sections">
         {Object.keys(tasks).map((section) => (
           <div className="section" key={section}>
@@ -233,13 +234,13 @@ function Dashboard() {
                   <li key={task._id}>
                     <div className="task-details">
                       <strong>{task.title}</strong>
+                      {task.description && <p>{task.description}</p>} {/* show description */}
                       <span
                         className={`priority ${task.priority?.toLowerCase?.() || "medium"
                           }`}
                       >
                         {task.priority || "Medium"}
                       </span>
-
                       <span className="date">📅 {task.deadline}</span>
                     </div>
                     <div
@@ -272,31 +273,18 @@ function Dashboard() {
                         🗑️ Delete
                       </button>
                     </div>
-                    
                   </li>
                 ))}
               </ul>
             )}
           </div>
-          
         ))}
-        <div className="task-sections">
-  {Object.keys(tasks).map((section) => (
-    <div className="section" key={section}>
-      ...
-    </div>
-  ))}
-</div>
 
-{/* 🔻 Add AI Summary below all task sections */}
-<AISummary tasks={tasks} />
-
+        {/* 🔻 Add AI Summary below all task sections */}
+        <AISummary tasks={tasks} />
       </div>
     </div>
-    
   );
-
-  
 }
 
 export default Dashboard;
